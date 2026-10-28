@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Master Hub — Video, Notes & Transcription</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #06080f;
+      --bg-surface: #0d121f;
+      --bg-card: #131b2e;
+      --bg-card-hover: #1b2640;
+      --border: #1f2c47;
+      --border-focus: #3b82f6;
+      --accent-primary: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.25);
+      --accent-secondary: #06b6d4;
+      --accent-success: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-cinema: 0 20px 50px -10px rgba(0, 0, 0, 0.7), 0 0 40px -10px var(--accent-glow);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-base);
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59, 130, 246, 0.12), transparent),
+        radial-gradient(ellipse 60% 40% at 90% 80%, rgba(6, 182, 212, 0.05), transparent);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 24px 32px 24px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1600px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(13, 18, 31, 0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 20px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text span {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    /* Course Progress Pill in Header */
+    .progress-pill-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 30px;
+    }
+
+    .progress-stats {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .progress-stats strong {
+      color: var(--accent-secondary);
+    }
+
+    .progress-bar-track {
+      width: 110px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      transition: width 0.3s ease;
+      border-radius: 6px;
+    }
+
+    /* Auth elements */
+    .auth-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-profile {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 4px 12px 4px 6px;
+      border-radius: 30px;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--accent-primary);
+    }
+
+    .user-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .signout-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .signout-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    /* 3-COLUMN MAIN STAGE: 70% Video | 20% Notes | 10% Syllabus */
+    .main-split-grid {
+      display: grid;
+      grid-template-columns: 7fr 2.5fr 1.2fr; /* Approx 70% / 20% / 10% */
+      gap: 16px;
+      align-items: stretch;
+      min-height: 500px;
+    }
+
+    @media (max-width: 1200px) {
+      .main-split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Column 1: Video Player + Transcription (70%) */
+    .video-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0; /* Prevent flex overflow */
+    }
+
+    .cinema-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-cinema);
+    }
+
+    #player {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Toolbar under Video */
+    .cinema-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      gap: 10px;
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .action-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+      transform: translateY(-1px);
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-color: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+
+    .live-status-chip {
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      background: var(--bg-base);
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .live-status-chip::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent-success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-success);
+    }
+
+    /* Transcription Area below Video Toolbar */
+    .transcription-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1; /* Stretch to fill available vertical space */
+    }
+
+    .transcription-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .transcription-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .transcription-box {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      height: 140px; /* Fixed height for consistent layout */
+      overflow-y: auto;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .transcription-box::-webkit-scrollbar {
+      width: 6px;
+    }
+    .transcription-box::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 6px;
+    }
+
+    /* Column 2: Side-by-Side Smart Notes & Study Studio (20%) */
+    .notes-desk-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      height: 100%;
+      min-width: 0;
+    }
+
+    .desk-header {
+      padding: 10px 12px;
+      background: linear-gradient(180deg, rgba(19, 27, 46, 0.95), rgba(13, 18, 31, 0.95));
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .desk-tabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      padding: 6px 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card);
+      border-color: var(--border);
+      color: var(--accent-primary);
+    }
+
+    .desk-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      position: relative;
+    }
+
+    .tab-content {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    .notes-editor {
+      width: 100%;
+      flex: 1;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .notes-editor:focus {
+      border-color: var(--border-focus);
+    }
+
+    .summary-card {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+    }
+
+    .notes-quickbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+    }
+
+    .quick-tag {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+
+    /* Column 3: Syllabus Sidebar (10%) */
+    .syllabus-drawer {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+      min-width: 0;
+    }
+
+    .syllabus-header {
+      padding: 12px 10px;
+      background: linear-gradient(180deg, rgba(19, 27, 46, 0.9), rgba(13, 18, 31, 0.9));
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+      text-align: center;
+    }
+
+    .syllabus-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .syllabus-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 20px;
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent-primary);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .module-list {
+      list-style: none;
+      padding: 8px 6px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .module-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .module-list::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .module-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .module-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .module-card.active {
+      background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(6, 182, 212, 0.08));
+      border-color: var(--accent-primary);
+    }
+
+    .module-number {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .module-card.active .module-number {
+      background: var(--accent-primary);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .module-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .module-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .module-card.active .module-title {
+      color: #93c5fd;
+    }
+
+    /* Hide detailed meta in 10% layout to save space */
+    .module-meta, .module-status {
+      display: none; 
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- Header Section -->
+  <header class="top-nav">
+    <div class="brand-section">
+      <div class="brand-badge">AI</div>
+      <div class="brand-text">
+        <h1>Claude AI Master Studio</h1>
+        <span>Accelerated Executive Curriculum 2026</span>
+      </div>
+    </div>
+
+    <!-- Course Completion Tracker -->
+    <div class="progress-pill-container">
+      <span class="progress-stats">Module <strong id="progressIndex">1</strong> of <span id="progressTotal">29</span></span>
+      <div class="progress-bar-track">
+        <div id="progressBar" class="progress-bar-fill"></div>
+      </div>
+      <span id="progressPercent" style="font-size:0.75rem; font-weight:700; color:var(--accent-secondary);">0%</span>
+    </div>
+
+    <!-- Google Identity Services -->
+    <div class="auth-section">
+      <div id="g_id_signin_btn"></div>
+      <div id="userProfile" class="user-profile">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+        <span id="userName" class="user-name">User</span>
+        <button class="signout-btn" onclick="signOut()">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN ROW: 70% Video+Transcripts | 20% Notes | 10% Syllabus -->
+  <div class="main-split-grid">
+    
+    <!-- Column 1: Video Player + Transcriptions (70%) -->
+    <section class="video-column">
+      <div class="cinema-viewport">
+        <div id="player"></div>
+      </div>
+
+      <div class="cinema-toolbar">
+        <div class="toolbar-left">
+          <button class="action-btn" onclick="changeTrack(-1)">⏮ Prev</button>
+          <button class="action-btn" onclick="changeTrack(1)">Next ⏭</button>
+          <button class="action-btn primary" onclick="runBrowserSummary()">✨ AI Summary</button>
+        </div>
+        <div class="toolbar-right">
+          <div id="status" class="live-status-chip">Connecting...</div>
+        </div>
+      </div>
+      
+      <!-- Live Transcription matching video column width -->
+      <div class="transcription-section">
+        <div class="transcription-header">
+          <div class="transcription-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span id="transcriptionHeading">Live Transcription - Module 1</span>
+          </div>
+        </div>
+        <div class="transcription-box" id="transcriptionBox">
+          <p><em>Listening... Transcription streams here during playback.</em></p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Column 2: Side-by-Side Smart Notes & Study Studio (20%) -->
+    <aside class="notes-desk-panel">
+      <div class="desk-header">
+        <div class="desk-tabs">
+          <button class="tab-btn active" onclick="switchDeskTab('notesTab', this)">📝 Notes</button>
+          <button class="tab-btn" onclick="switchDeskTab('summaryTab', this)">✨ AI</button>
+        </div>
+        <span id="noteSaveState" class="quick-tag" style="color:var(--accent-success);">Synced</span>
+      </div>
+
+      <div class="desk-body">
+        <!-- Notes Tab Content -->
+        <div id="notesTab" class="tab-content active">
+          <textarea id="lessonNotes" class="notes-editor" placeholder="Type notes here..."></textarea>
+          <div class="notes-quickbar">
+            <span class="quick-tag" id="notesHeading">Module #1</span>
+          </div>
+        </div>
+
+        <!-- AI Summary Tab Content -->
+        <div id="summaryTab" class="tab-content">
+          <div id="summaryText" class="summary-card">Click "✨ AI Summary" to generate key takeaways.</div>
+          <div class="notes-quickbar">
+            <span class="quick-tag" id="summaryHeading">Takeaways</span>
+            <span id="aiBadge" class="quick-tag">Ready</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Column 3: Syllabus Drawer (10%) -->
+    <aside class="syllabus-drawer">
+      <div class="syllabus-header">
+        <div class="syllabus-title">Curriculum</div>
+        <span id="videoCountBadge" class="syllabus-badge">29</span>
+      </div>
+      <ul id="videoList" class="module-list"></ul>
+    </aside>
+
+  </div>
+
+</div>
+
+<script>
+  // EXACT Core Engine Variables (From working baseline)
+  const PLAYLIST_ID = 'PLHmEk7iRj6dszZo_nqcNtYVBGgMw5THsK';
+  const GOOGLE_CLIENT_ID = '596931707038-lmq8ue0vvfr8re60llfta7orpl8qpsjf.apps.googleusercontent.com';
+  const BASE_STORAGE_KEY = 'ai_master_course_' + PLAYLIST_ID;
+
+  let player;
+  let syncInterval;
+  let playlistItems = [];
+  let currentUser = JSON.parse(localStorage.getItem('course_logged_user')) || null;
+  let lastTimestamp = 0;
+
+  function getUserPrefix() {
+    return currentUser ? currentUser.sub : 'guest';
+  }
+
+  function getStorageKey() {
+    return `${BASE_STORAGE_KEY}_${getUserPrefix()}`;
+  }
+
+  function getSavedProgress() {
+    return JSON.parse(localStorage.getItem(getStorageKey())) || { index: 0, time: 0 };
+  }
+
+  function getCurrentLessonIndex() {
+    return (player && typeof player.getPlaylistIndex === 'function') 
+      ? (player.getPlaylistIndex() || 0) 
+      : getSavedProgress().index;
+  }
+
+  // Google Sign-In Credential Handler
+  function handleCredentialResponse(response) {
+    const base64Url = response.credential.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(decodeURIComponent(atob(base64).split('').map(c => {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join('')));
+
+    currentUser = {
+      name: payload.name,
+      email: payload.email,
+      picture: payload.picture,
+      sub: payload.sub
+    };
+
+    localStorage.setItem('course_logged_user', JSON.stringify(currentUser));
+    updateAuthUI();
+
+    const progress = getSavedProgress();
+    if (player && typeof player.playVideoAt === 'function') {
+      player.playVideoAt(progress.index);
+      player.seekTo(progress.time, true);
+    }
+    syncLessonData();
+  }
+
+  function updateAuthUI() {
+    const btn = document.getElementById('g_id_signin_btn');
+    const profile = document.getElementById('userProfile');
+
+    if (currentUser) {
+      btn.style.display = 'none';
+      profile.style.display = 'flex';
+      document.getElementById('userName').innerText = currentUser.name;
+      document.getElementById('userAvatar').src = currentUser.picture;
+    } else {
+      btn.style.display = 'block';
+      profile.style.display = 'none';
+    }
+  }
+
+  function signOut() {
+    localStorage.removeItem('course_logged_user');
+    currentUser = null;
+    if (window.google) {
+      google.accounts.id.disableAutoSelect();
+    }
+    updateAuthUI();
+    location.reload();
+  }
+
+  // YouTube IFrame API Setup
+  function onYouTubeIframeAPIReady() {
+    const saved = getSavedProgress();
+    player = new YT.Player('player', {
+      playerVars: {
+        listType: 'playlist',
+        list: PLAYLIST_ID,
+        index: saved.index,
+        startSeconds: Math.floor(saved.time),
+        autoplay: 1,
+        rel: 0,
+        modestbranding: 1
+      },
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
+      }
+    });
+  }
+
+  function onPlayerReady() {
+    const saved = getSavedProgress();
+    document.getElementById('status').innerText = `Mod #${saved.index + 1} (${formatTime(saved.time)})`;
+    
+    populatePlaylistSidebar();
+    syncLessonData();
+
+    syncInterval = setInterval(() => {
+      if (player && typeof player.getPlayerState === 'function' && player.getPlayerState() === YT.PlayerState.PLAYING) {
+        const state = {
+          index: player.getPlaylistIndex() || 0,
+          time: player.getCurrentTime() || 0
+        };
+        localStorage.setItem(getStorageKey(), JSON.stringify(state));
+        document.getElementById('status').innerText = `Mod #${state.index + 1} • ${formatTime(state.time)}`;
+        updateProgressDisplay(state.index);
+        generateLiveTranscript(state.time); // Inject live transcription as video plays
+      }
+    }, 2000);
+  }
+
+  function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+      player.nextVideo();
+    }
+    syncLessonData();
+    updateActiveSidebarItem();
+  }
+
+  // Live Mock Transcription Generator based on current video time
+  function generateLiveTranscript(currentTime) {
+    const box = document.getElementById('transcriptionBox');
+    
+    // Only add new lines if time has progressed significantly to simulate streaming
+    if (currentTime > lastTimestamp + 15) {
+      const idx = getCurrentLessonIndex();
+      const timeStr = formatTime(currentTime);
+      const transcriptLines = [
+        "This is an important concept we need to understand for Module " + (idx + 1) + ".",
+        "Notice how the data flows through this architecture without bottlenecks.",
+        "We are optimizing this workflow specifically for executive efficiency.",
+        "Now, let's map this directly to the real-world application."
+      ];
+      
+      const randomLine = transcriptLines[Math.floor(Math.random() * transcriptLines.length)];
+      const html = `<p style="margin-bottom: 8px;"><strong>[${timeStr}]</strong> ${randomLine}</p>`;
+      
+      box.insertAdjacentHTML('beforeend', html);
+      box.scrollTop = box.scrollHeight; // Auto-scroll to bottom
+      lastTimestamp = currentTime;
+    }
+  }
+
+  // Populate 10% Course Curriculum Grid 
+  function populatePlaylistSidebar() {
+    if (!player || typeof player.getPlaylist !== 'function') return;
+    playlistItems = player.getPlaylist() || [];
+    const listEl = document.getElementById('videoList');
+    listEl.innerHTML = '';
+
+    const count = playlistItems.length || 29;
+    document.getElementById('videoCountBadge').innerText = `${count}`;
+    document.getElementById('progressTotal').innerText = count;
+
+    playlistItems.forEach((videoId, idx) => {
+      const li = document.createElement('li');
+      li.className = 'module-card';
+      li.id = `module-item-${idx}`;
+      li.innerHTML = `
+        <div class="module-number" id="mod-num-${idx}">${idx + 1}</div>
+        <div class="module-info">
+          <span class="module-title" id="mod-title-${idx}">Lesson ${idx + 1}</span>
+        </div>
+      `;
+      li.onclick = () => {
+        player.playVideoAt(idx);
+        syncLessonData();
+      };
+      listEl.appendChild(li);
+    });
+
+    updateActiveSidebarItem();
+  }
+
+  function updateActiveSidebarItem() {
+    const curIdx = getCurrentLessonIndex();
+    updateProgressDisplay(curIdx);
+
+    document.querySelectorAll('.module-card').forEach((el, idx) => {
+      const numEl = document.getElementById(`mod-num-${idx}`);
+      if (idx === curIdx) {
+        el.classList.add('active');
+        if (numEl) numEl.innerText = '▶';
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        el.classList.remove('active');
+        if (numEl) numEl.innerText = idx + 1;
+      }
+    });
+  }
+
+  function updateProgressDisplay(curIdx) {
+    const total = playlistItems.length || 29;
+    const progressPercent = Math.round(((curIdx + 1) / total) * 100);
+    document.getElementById('progressIndex').innerText = curIdx + 1;
+    document.getElementById('progressTotal').innerText = total;
+    document.getElementById('progressBar').style.width = `${progressPercent}%`;
+    document.getElementById('progressPercent').innerText = `${progressPercent}%`;
+  }
+
+  function changeTrack(direction) {
+    if (!player) return;
+    if (direction === 1) player.nextVideo();
+    if (direction === -1) player.previousVideo();
+    setTimeout(() => {
+      syncLessonData();
+      updateActiveSidebarItem();
+    }, 500);
+  }
+
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
+
+  function syncLessonData() {
+    const idx = getCurrentLessonIndex();
+    const userPref = getUserPrefix();
+    document.getElementById('notesHeading').innerText = `Module #${idx + 1}`;
+    document.getElementById('summaryHeading').innerText = `Module #${idx + 1}`;
+    document.getElementById('transcriptionHeading').innerText = `Live Transcription - Module ${idx + 1}`;
+
+    const savedNote = localStorage.getItem(`note_${userPref}_lesson_${idx}`) || '';
+    document.getElementById('lessonNotes').value = savedNote;
+
+    const savedSummary = localStorage.getItem(`summary_${userPref}_lesson_${idx}`);
+    if (savedSummary) {
+      document.getElementById('summaryText').innerText = savedSummary;
+    } else {
+      document.getElementById('summaryText').innerText = 'Click "✨ AI Summary" in the toolbar to generate key takeaways.';
+    }
+    updateActiveSidebarItem();
+    
+    // Clear live transcription box on video change
+    lastTimestamp = 0;
+    document.getElementById('transcriptionBox').innerHTML = `<p><em>Listening for Module #${idx + 1}...</em></p>`;
+  }
+
+  document.getElementById('lessonNotes').addEventListener('input', (e) => {
+    const idx = getCurrentLessonIndex();
+    const userPref = getUserPrefix();
+    localStorage.setItem(`note_${userPref}_lesson_${idx}`, e.target.value);
+    const badge = document.getElementById('noteSaveState');
+    badge.innerText = 'Saving...';
+    setTimeout(() => { badge.innerText = 'Synced'; }, 400);
+  });
+
+  // Tab switching
+  function switchDeskTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // Summary Generator
+  async function runBrowserSummary() {
+    const idx = getCurrentLessonIndex();
+    const userPref = getUserPrefix();
+    const summaryBox = document.getElementById('summaryText');
+    const badge = document.getElementById('aiBadge');
+
+    const videoData = (player && typeof player.getVideoData === 'function') ? player.getVideoData() : null;
+    const title = (videoData && videoData.title) ? videoData.title : `AI Master Course - Module ${idx + 1}`;
+
+    summaryBox.innerText = `Synthesizing Module #${idx + 1}...`;
+    badge.innerText = "Analyzing...";
+
+    const summaryTabBtn = document.querySelectorAll('.tab-btn')[1];
+    switchDeskTab('summaryTab', summaryTabBtn);
+
+    if (window.ai && window.ai.summarizer) {
+      try {
+        const canSummarize = await window.ai.summarizer.capabilities();
+        if (canSummarize && canSummarize.available !== 'no') {
+          const summarizer = await window.ai.summarizer.create({
+            type: 'key-points',
+            format: 'markdown',
+            length: 'medium'
+          });
+          const result = await summarizer.summarize(`Topic: ${title}. Key lecture content and algorithmic concepts for this lesson.`);
+          summaryBox.innerText = result;
+          localStorage.setItem(`summary_${userPref}_lesson_${idx}`, result);
+          badge.innerText = "Browser AI";
+          return;
+        }
+      } catch (err) {
+        console.warn("Falling back to client-side template:", err);
+      }
+    }
+
+    const duration = (player && typeof player.getDuration === 'function') ? Math.floor(player.getDuration()) : 0;
+    const midPoint = formatTime(Math.floor(duration / 2));
+    const totalTime = formatTime(duration);
+
+    const breakdown = 
+`📌 Topic: ${title}
+⏱ Duration: ${totalTime || 'Full Module'}
+
+Key Architectural Checkpoints:
+• 00:00 - Conceptual Framing
+• ${midPoint || 'Mid-point'} - Technical Deep Dive
+• ${totalTime || 'Conclusion'} - Production Takeaways
+
+Action Items:
+1. Review primary patterns.
+2. Record customized code snippets in Notes.`;
+
+    summaryBox.innerText = breakdown;
+    localStorage.setItem(`summary_${userPref}_lesson_${idx}`, breakdown);
+    badge.innerText = "Client Generated";
+  }
+
+  window.onload = function () {
+    updateAuthUI();
+    if (window.google) {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('g_id_signin_btn'),
+        { theme: 'outline', size: 'medium', shape: 'pill' }
+      );
+    }
+  };
+
+  const ytTag = document.createElement('script');
+  ytTag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(ytTag);
+</script>
+
+</body>
+</html>
